@@ -146,12 +146,16 @@ def process_event(self, event_id, event_type, aggregate_type, aggregate_id, payl
             # Track event count
             today = date.today()
             from django.db import models
-            EventCount.objects.update_or_create(
+            
+            # Get or create, then increment
+            event_count, created = EventCount.objects.get_or_create(
                 date=today,
                 event_type=event_type,
                 aggregate_type=aggregate_type,
-                defaults={'count': models.F('count') + 1}
+                defaults={'count': 0}
             )
+            event_count.count = models.F('count') + 1
+            event_count.save(update_fields=['count'])
 
             # Route to specific handler
             if aggregate_type == 'leads':
