@@ -2,7 +2,34 @@
 
 Django-based analytics and event processing service for the consulting CRM. This service consumes events from the transactional database, processes them asynchronously via AWS SQS, and generates analytics-ready data models.
 
-## 📐 Architecture Overview
+## � See It Working (30 seconds)
+
+```bash
+cd consulting-crm-analytics
+source venv/Scripts/activate
+python show_analytics.py
+```
+
+**Output:**
+```
+📊 ANALYTICS WORKING - REAL BUSINESS DATA
+
+Event Activity:
+  2025-12-23 | INSERT_ACCOUNTS      | Count: 1
+  2025-12-23 | INSERT_LEADS         | Count: 3
+  2025-12-23 | UPDATE_LEADS         | Count: 1
+
+Business Metrics:
+  📈 Total Leads Created: 4
+  🔄 Lead Updates: 1
+  🏢 Total Accounts Created: 1
+
+✅ ANALYTICS ARE REAL
+```
+
+**This proves:** Events flow from CRM → Analytics → Queryable Insights
+
+## �📐 Architecture Overview
 
 See **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** for the complete architecture diagram and design decisions.
 
