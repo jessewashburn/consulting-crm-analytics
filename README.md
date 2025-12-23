@@ -2,6 +2,26 @@
 
 Django-based analytics and event processing service for the consulting CRM. This service consumes events from the transactional database, processes them asynchronously via AWS SQS, and generates analytics-ready data models.
 
+## 📐 Architecture Overview
+
+See **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** for the complete architecture diagram and design decisions.
+
+See **[docs/IDEMPOTENCY.md](docs/IDEMPOTENCY.md)** for production-grade failure handling and idempotency implementation.
+
+### How Data Flows (30-second version)
+
+1. **CRM Event Occurs** → User creates/updates lead in Supabase
+2. **Trigger Fires** → Event automatically inserted into `event_outbox` (same transaction)
+3. **Celery Polls** → Every 30s, batch of events fetched and published to SQS
+4. **Workers Process** → Celery workers consume from SQS, update analytics tables, archive to S3
+5. **API Serves** → Django REST API exposes pre-aggregated data to dashboards
+
+**Key Properties:** 
+- ✅ Events never lost (transactional outbox)
+- ✅ Processing is idempotent (safe to retry)
+- ✅ Failures are retried automatically (exponential backoff)
+- ✅ Dead-letter queue for permanent failures
+
 ## Architecture
 
 ```
