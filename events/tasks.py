@@ -73,11 +73,11 @@ def poll_event_outbox():
                 return 0
         
         # Mark events as processed
-        event_ids = [str(event[0]) for event in events]
+        event_ids = [event[0] for event in events]
         cursor.execute("""
             UPDATE event_outbox
             SET processed_at = NOW(), published_at = NOW()
-            WHERE id = ANY(%s)
+            WHERE id = ANY(%s::uuid[])
         """, [event_ids])
         
         # Process events locally (for now, until SQS consumer is set up)
@@ -100,6 +100,7 @@ def process_event(event_type, aggregate_type, aggregate_id, payload):
     try:
         # Track event count
         today = date.today()
+        from django.db import models
         EventCount.objects.update_or_create(
             date=today,
             event_type=event_type,
@@ -160,6 +161,7 @@ def _process_account_event(event_type, payload):
 
 def _process_project_event(event_type, payload):
     """Update project and revenue metrics."""
+    from django.db import models
     account_id = payload.get('account_id')
     contract_value = Decimal(payload.get('contract_value') or 0)
     
